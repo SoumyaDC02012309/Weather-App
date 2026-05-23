@@ -1,0 +1,9 @@
+streamlit
+requests
+google_genai
+google-api-core
+plotly
+pandas
+streamlit-folium
+folium
+python-dotenv
