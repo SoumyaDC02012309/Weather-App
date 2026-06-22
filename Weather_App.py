@@ -177,9 +177,19 @@ def main():
     city = st.sidebar.text_input('Enter City Name')
 
     #API Keys
-    accuweather_API_key = os.getenv("ACCUWEATHER_API_KEY") 
+    # accuweather_API_key = os.getenv("ACCUWEATHER_API_KEY") 
 
-    gemini_API_key = os.getenv("GEMINI_API_KEY")
+    # gemini_API_key = os.getenv("GEMINI_API_KEY")
+
+    accuweather_API_key = st.secrets.get(
+        "ACCUWEATHER_API_KEY",
+        os.getenv("ACCUWEATHER_API_KEY")
+    )
+
+    gemini_API_key = st.secrets.get(
+        "GEMINI_API_KEY",
+        os.getenv("GEMINI_API_KEY")
+    )
 
     print("API KEY: ", accuweather_API_key)
     print("GEMINI KEY: ", gemini_API_key)
