@@ -6,8 +6,10 @@ from google import genai
 import pandas as pd
 import plotly.graph_objects as go
 from streamlit_folium import folium_static
+from streamlit_lottie import st_lottie
 import folium
 import os
+import time
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -105,7 +107,7 @@ def generate_weather_description(data, gemini_API_key):
         """
 
         response = client.models.generate_content(
-            model="gemini-2.5-flash",
+            model="gemini-2.5-flash-lite",
             contents=prompt
         )
 
@@ -253,9 +255,138 @@ def main():
 
 
                 # Generate and display a friendly weather description
+                # st.header(':orange[Some Pros & Cons you should take in this weather]', divider='blue')
+                # weather_description = generate_weather_description(weather_data, gemini_API_key)
+                # st.write(weather_description)
+
+                # Generate and display a friendly weather description
+
                 st.header(':orange[Some Pros & Cons you should take in this weather]', divider='blue')
-                weather_description = generate_weather_description(weather_data, gemini_API_key)
-                st.write(weather_description)
+
+                lottie_url = "https://assets9.lottiefiles.com/packages/lf20_x62chJ.json"
+
+                lottie_json = requests.get(lottie_url).json()
+
+                st_lottie(lottie_json, height=220, key="ai_loader")
+
+                # Instagram-style loading card
+                loading_container = st.empty()
+
+                loading_container.markdown("""
+                <style>
+
+                .loading-card {
+                    background: linear-gradient(
+                        135deg,
+                        rgba(255,255,255,0.15),
+                        rgba(255,255,255,0.05)
+                    );
+                    backdrop-filter: blur(12px);
+                    padding: 25px;
+                    border-radius: 20px;
+                    border: 1px solid rgba(255,255,255,0.2);
+                    text-align: center;
+                    margin-bottom: 15px;
+                    box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+                }
+
+                .ai-icon {
+                    font-size: 45px;
+                    margin-bottom: 10px;
+                }
+
+                .loading-text {
+                    font-size: 20px;
+                    font-weight: 600;
+                    color: #FF4B4B;
+                }
+
+                .sub-text {
+                    color: gray;
+                    margin-top: 8px;
+                }
+
+                .dots::after {
+                    content: '';
+                    animation: dots 1.5s infinite;
+                }
+
+                @keyframes dots {
+                    0% {content:'';}
+                    25% {content:'.';}
+                    50% {content:'..';}
+                    75% {content:'...';}
+                    100% {content:'';}
+                }
+
+                </style>
+
+                <div class="loading-card">
+                    <div class="ai-icon">🤖</div>
+                    <div class="loading-text">
+                        Gemini AI is thinking<span class="dots"></span>
+                    </div>
+
+                #     <div class="sub-text">
+                #         Analyzing weather patterns and preparing personalized recommendations
+                #     </div>
+                # </div>
+                """, unsafe_allow_html=True)
+
+                progress = st.progress(0)
+
+                status = st.empty()
+
+                steps = [
+                    "🌍 Fetching weather information...",
+                    "☁️ Processing atmospheric conditions...",
+                    "🌡️ Checking temperature & humidity...",
+                    "🧠 Gemini is analyzing...",
+                    "✨ Generating recommendations..."
+                ]
+
+                for i, step in enumerate(steps):
+
+                    status.markdown(
+                        f"""
+                        <div style="
+                        padding:12px;
+                        border-radius:12px;
+                        background:#f0f2f6;
+                        font-weight:500;
+                        ">
+                        {step}
+                        </div>
+                        """,
+                        unsafe_allow_html=True
+                    )
+
+                    progress.progress((i + 1) * 20)
+
+                    time.sleep(0.5)
+
+                with st.spinner("Gemini AI is generating insights..."):
+
+                    weather_description = generate_weather_description(
+                        weather_data,
+                        gemini_API_key
+                    )
+
+                loading_container.empty()
+                progress.empty()
+                status.empty()
+
+                # st.success("✨ Weather insights generated successfully!")
+
+                # st.markdown(weather_description)
+                typing_placeholder = st.empty()
+
+                display_text = ""
+
+                for char in weather_description:
+                    display_text += char
+                    typing_placeholder.markdown(display_text)
+                    time.sleep(0.005)
 
                 # Call function to get weekly forecast
                 st.header(':orange[5 days Weather Forecast]', divider='rainbow')
